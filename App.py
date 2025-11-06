@@ -12,6 +12,18 @@ from tensorflow.keras.preprocessing import image
 import numpy as np
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
+from flask import Flask
+import os
+
+app = Flask(__name__)
+
+@app.route('/')
+def home():
+    return "Hola, el servidor Flask está funcionando correctamente en Railway"
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
 
 # -------------------- CARGA DEL MODELO --------------------
 MODEL_PATH = os.path.join(os.getcwd(), "modelo", "modelo_final_inceptionv3.keras")
