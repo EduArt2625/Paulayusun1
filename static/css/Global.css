@@ -1,0 +1,32 @@
+/* Aplica a todo el documento */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* El contenedor principal ocupa todo el espacio disponible */
+.contenido-principal {
+  flex: 1;
+}
+
+/* Pantallas pequeñas (celulares) */
+@media (max-width: 576px) {
+  .titulo {
+    font-size: 1.8rem; /* Más pequeño en móvil */
+  }
+
+  .preview-container {
+    width: 100%;  /* Ocupa todo el ancho */
+    height: auto;
+  }
+}
+
+/* Pantallas medianas (tablets) */
+@media (min-width: 577px) and (max-width: 991px) {
+  .titulo {
+    font-size: 2.2rem;
+  }
+}
