@@ -12,8 +12,8 @@ from tensorflow.keras.preprocessing import image
 import numpy as np
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
-from flask import Flask
-import os
+
+
 
 
 
@@ -48,8 +48,8 @@ os.makedirs(RESULT_FOLDER, exist_ok=True)
 # -------------------- RUTAS DE PÁGINAS --------------------
 
 @app.route('/')
-def home():
-    return "Hola, el servidor Flask está funcionando correctamente en Railway"
+def index():
+    return render_template('index.html')
 
 @app.route('/escaneo')
 def escaneo():
@@ -177,3 +177,4 @@ def generar_pdf():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
