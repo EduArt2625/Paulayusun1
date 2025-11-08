@@ -1,15 +1,11 @@
-Flask==3.1.2
-gunicorn==22.0.0
-wrapt==2.0.0
-keras==3.11.3
-numpy==2.0.2
-reportlab==4.4.4
-fpdf2==2.7.9
+Flask==3.0.3
+gunicorn==21.2.0
+tensorflow==2.15.0
+numpy==1.26.4
 pandas==2.2.2
-pillow==10.4.0
-pip>=25.3
-setuptools>=75.0
-wheel>=0.44
+pillow==10.2.0
+reportlab==4.2.2
+fpdf2==2.7.9
 
 
 
