@@ -13,7 +13,9 @@ import numpy as np
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 
-
+import os
+import gdown
+from keras.models import load_model
 
 
 
@@ -22,21 +24,26 @@ from reportlab.lib.pagesizes import A4
 
 
 # -------------------- CARGA DEL MODELO --------------------
-MODEL_PATH = os.path.join(os.getcwd(), "modelo", "modelo_final_inceptionv3.keras")
 
-print("Cargando modelo, por favor espera...")
-loaded_modelo = load_model(
-    MODEL_PATH,
-    custom_objects={'preprocess_input': preprocess_input},
-    compile=False
-)
 
-output = loaded_modelo.output[0] if isinstance(loaded_modelo.output, list) else loaded_modelo.output
-modelo = Model(inputs=loaded_modelo.input, outputs=output)
+# Ruta donde se guardará o leerá el modelo
+MODEL_PATH = "modelo/modelo_final_inceptionv3.keras"
 
-print("✅ Modelo cargado correctamente.")
-print("Entradas del modelo:")
-print(modelo.inputs)
+# URL de descarga directa desde Google Drive
+# Reemplaza el ID por el tuyo:
+DRIVE_ID = "1ff0tinkKeYayYOSf3v1KfY1c3t3CXkcb"
+URL = f"https://drive.google.com/uc?id={DRIVE_ID}"
+
+# Si no existe el archivo localmente, descárgalo
+if not os.path.exists(MODEL_PATH):
+    os.makedirs(os.path.dirname(MODEL_PATH), exist_ok=True)
+    print("Descargando modelo desde Google Drive...")
+    gdown.download(URL, MODEL_PATH, quiet=False)
+
+# Carga el modelo
+print("Cargando modelo...")
+loaded_modelo = load_model(MODEL_PATH)
+print("Modelo cargado correctamente ✅")
 
 # -------------------- CONFIGURACIÓN DE FLASK --------------------
 app = Flask(__name__)
@@ -177,6 +184,7 @@ def generar_pdf():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(debug=True, host="0.0.0.0", port=os.getenv("PORT", default=5000))
+
 
 
 
