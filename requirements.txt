@@ -1,7 +1,12 @@
 Flask==3.1.2
 gunicorn==22.0.0
 wrapt==2.0.0
-
+keras==3.11.3
+numpy==2.0.2
+reportlab==4.4.4
+fpdf2==2.8.4
+pandas==2.2.2
+pillow==10.4.0
 
 
 
