@@ -16,33 +16,12 @@ import os
 import gdown
 from keras.models import load_model
 
-#from tkinter import Canvas
-#from tkinter.tix import Meter
-from flask import Flask, request, jsonify, render_template, send_file
-import os
-from datetime import datetime
-from io import BytesIO
-from fpdf import FPDF
-import tensorflow as tf
-from tensorflow.keras.models import load_model, Model
-from tensorflow.keras.applications.inception_v3 import preprocess_input
-from tensorflow.keras.preprocessing import image
-import numpy as np
-from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import A4
-import os
-import gdown
-from keras.models import load_model
-
 # -------------------- CARGA DEL MODELO --------------------
-
 # Ruta local del modelo
 MODEL_PATH = os.path.join(os.getcwd(), "modelo", "modelo_final_inceptionv3.keras")
-
 # ID de Google Drive (reemplázalo por el tuyo si cambia)
 DRIVE_ID = "1ff0tinkKeYayYOSf3v1KfY1c3t3CXkcb"
 URL = f"https://drive.google.com/uc?id={DRIVE_ID}"
-
 # Verifica si el modelo existe localmente; si no, lo descarga
 if not os.path.exists(MODEL_PATH):
     try:
@@ -71,26 +50,19 @@ if not os.path.exists(MODEL_PATH):
             exit(1)
 
 # -------------------- CONFIGURACIÓN DE FLASK --------------------
-
 app = Flask(__name__)
-
 # Carpetas para subir imágenes y guardar resultados
 UPLOAD_FOLDER = os.path.join(app.root_path, "static", "uploads")
 RESULT_FOLDER = os.path.join(app.root_path, "static", "resultados")
-
 # Crear carpetas si no existen
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(RESULT_FOLDER, exist_ok=True)
-
 # Límite de tamaño para archivos (16 MB)
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
 print("📁 Carpetas configuradas correctamente.")
 print("🚀 Flask listo para recibir solicitudes.")
-
-
 # -------------------- RUTAS DE PÁGINAS --------------------
-
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -112,21 +84,17 @@ def terminos():
     return render_template('Terminos.html')
 
 # -------------------- RUTA DE ANÁLISIS --------------------
-
 @app.route("/analizar", methods=["POST"])
 def analizar():
     try:
         if "file" not in request.files:
             return jsonify({"error": "No se ha enviado ningún archivo."})
-
         file = request.files["file"]
         if file.filename == "":
             return jsonify({"error": "Archivo no válido."})
-
         # Guardar archivo
         filepath = os.path.join(UPLOAD_FOLDER, file.filename)
         file.save(filepath)
-
         if not os.path.exists(filepath):
             return jsonify({"error": f"El archivo no se guardó correctamente en {filepath}"}), 500
 
@@ -139,16 +107,14 @@ def analizar():
         except Exception as e:
             print("⚠️ Error al abrir la imagen:", e)
             return jsonify({"error": f"No se puede abrir la imagen: {e}"}), 500
-
         img_array = image.img_to_array(img)
         img_array = np.expand_dims(img_array, axis=0)
         img_array = img_array / 255.0
-
+       
         # Predicción
         pred = modelo.predict(img_array)
         indice = np.argmax(pred)
         confianza = round(float(np.max(pred)) * 100, 2)
-
         clases = [
             "Melanoma",
             "Carcinoma de células basales",
@@ -156,7 +122,6 @@ def analizar():
             "Lesión Benigna"
         ]
         clase = clases[indice]
-
         print(f"✅ Predicción: {clase} ({confianza}%)")
 
         return jsonify({
@@ -477,6 +442,7 @@ def generar_pdf():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(debug=True, host="0.0.0.0", port=os.getenv("PORT", default=5000))
+
 
 
 
