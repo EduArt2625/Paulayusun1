@@ -83,13 +83,17 @@ body {
   display: none;
 }
 
-#progress {
-  width: 0%;
-  height: 100%;
-  background: black;
+/* Barra de progreso */
+.progress-bar-custom {
+  width: 60%;
+  height: 15px;
+  background: white;
+  border: 2px solid black;
   border-radius: 20px;
+  margin: 20px auto;
+  display: none;
+  
 }
-
 .info-box {
   width: 100vw;
   margin-left: calc(-50vw + 50%);
@@ -169,4 +173,5 @@ footer a:hover {
   height: 40px; /* Cambia el tamaño */
   width: auto;
 }
+
 
