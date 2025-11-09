@@ -132,11 +132,11 @@ def analizar():
             "imagen_url": f"/static/uploads/{file.filename}"
         })
 
-   except Exception as e:
-        import traceback
-        print("❌ Error completo:")
-        traceback.print_exc()
-        return jsonify({"error": str(e)}), 500
+         except Exception as e:
+            import traceback
+            print("❌ Error completo en analizar():")
+            traceback.print_exc()
+            return jsonify({"error": f"No se puede procesar la imagen: {e}"}), 500
 
 
 
@@ -202,6 +202,7 @@ def generar_pdf():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(debug=True, host="0.0.0.0", port=os.getenv("PORT", default=5000))
+
 
 
 
