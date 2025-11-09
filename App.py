@@ -12,7 +12,6 @@ from tensorflow.keras.preprocessing import image
 import numpy as np
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
-
 import os
 import gdown
 from keras.models import load_model
@@ -184,6 +183,7 @@ def generar_pdf():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(debug=True, host="0.0.0.0", port=os.getenv("PORT", default=5000))
+
 
 
 
