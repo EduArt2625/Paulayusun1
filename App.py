@@ -23,33 +23,66 @@ from keras.models import load_model
 
 
 # -------------------- CARGA DEL MODELO --------------------
+# -------------------- IMPORTACIONES --------------------
+import os
+import gdown
+from flask import Flask
+from tensorflow.keras.models import load_model
 
+# -------------------- CARGA DEL MODELO --------------------
 
-# Ruta donde se guardará o leerá el modelo
-#MODEL_PATH = "modelo/modelo_final_inceptionv3.keras"
+# Ruta local del modelo
 MODEL_PATH = os.path.join(os.getcwd(), "modelo", "modelo_final_inceptionv3.keras")
-#URL de descarga directa desde Google Drive
-#Reemplaza el ID por el tuyo:
+
+# ID de Google Drive (reemplázalo por el tuyo si cambia)
 DRIVE_ID = "1ff0tinkKeYayYOSf3v1KfY1c3t3CXkcb"
 URL = f"https://drive.google.com/uc?id={DRIVE_ID}"
 
-# Si no existe el archivo localmente, descárgalo
+# Verifica si el modelo existe localmente; si no, lo descarga
 if not os.path.exists(MODEL_PATH):
-    os.makedirs(os.path.dirname(MODEL_PATH), exist_ok=True)
-    print("Descargando modelo desde Google Drive...")
-    gdown.download(URL, MODEL_PATH, quiet=False)
+    try:
+        os.makedirs(os.path.dirname(MODEL_PATH), exist_ok=True)
+        print("🔽 Descargando modelo desde Google Drive...")
+        gdown.download(URL, MODEL_PATH, quiet=False, fuzzy=True)
 
-# Carga el modelo
-print("Cargando modelo...")
-loaded_modelo = load_model(MODEL_PATH)
-print("Modelo cargado correctamente ✅")
+        if os.path.exists(MODEL_PATH):
+            print("✅ Modelo descargado correctamente.")
+        else:
+            raise FileNotFoundError("❌ Error: El modelo no se descargó correctamente.")
+
+    except Exception as e:
+        print(f"⚠️ Error al descargar el modelo: {e}")
+        print("Por favor, verifica tu conexión o el enlace de Google Drive.")
+        exit(1)
+
+# Intenta cargar el modelo
+try:
+    print("🧠 Cargando modelo...")
+    loaded_modelo = load_model(MODEL_PATH)
+    print("✅ Modelo cargado correctamente.")
+except Exception as e:
+    print(f"❌ Error al cargar el modelo: {e}")
+    print("Verifica que el archivo .keras esté completo y sea compatible.")
+    exit(1)
 
 # -------------------- CONFIGURACIÓN DE FLASK --------------------
+
 app = Flask(__name__)
-UPLOAD_FOLDER = 'static/uploads'
-RESULT_FOLDER = 'static/resultados'
+
+# Carpetas para subir imágenes y guardar resultados
+UPLOAD_FOLDER = os.path.join("static", "uploads")
+RESULT_FOLDER = os.path.join("static", "resultados")
+
+# Crear carpetas si no existen
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(RESULT_FOLDER, exist_ok=True)
+
+# Límite de tamaño para archivos (16 MB)
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
+
+print("📁 Carpetas configuradas correctamente.")
+print("🚀 Flask listo para recibir solicitudes.")
+
 
 # -------------------- RUTAS DE PÁGINAS --------------------
 
@@ -183,6 +216,7 @@ def generar_pdf():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(debug=True, host="0.0.0.0", port=os.getenv("PORT", default=5000))
+
 
 
 
