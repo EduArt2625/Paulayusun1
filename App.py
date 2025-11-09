@@ -16,19 +16,6 @@ import os
 import gdown
 from keras.models import load_model
 
-
-
-
-
-
-
-# -------------------- CARGA DEL MODELO --------------------
-# -------------------- IMPORTACIONES --------------------
-import os
-import gdown
-from flask import Flask
-from tensorflow.keras.models import load_model
-
 # -------------------- CARGA DEL MODELO --------------------
 
 # Ruta local del modelo
@@ -216,6 +203,7 @@ def generar_pdf():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(debug=True, host="0.0.0.0", port=os.getenv("PORT", default=5000))
+
 
 
 
