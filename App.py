@@ -42,7 +42,7 @@ if not os.path.exists(MODEL_PATH):
 # Intenta cargar el modelo
 try:
     print("🧠 Cargando modelo...")
-     modelo = load_model(MODEL_PATH)
+    modelo = load_model(MODEL_PATH)
     print("✅ Modelo cargado correctamente.")
 except Exception as e:
     print(f"❌ Error al cargar el modelo: {e}")
@@ -203,6 +203,7 @@ def generar_pdf():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(debug=True, host="0.0.0.0", port=port)
+
 
 
 
