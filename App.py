@@ -12,16 +12,16 @@ from tensorflow.keras.preprocessing import image
 import numpy as np
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
-import os
 import gdown
 from keras.models import load_model
 
 # -------------------- CARGA DEL MODELO --------------------
-# Ruta local del modelo
 MODEL_PATH = os.path.join(os.getcwd(), "modelo", "modelo_final_inceptionv3.keras")
+
 # ID de Google Drive (reemplázalo por el tuyo si cambia)
 DRIVE_ID = "1ff0tinkKeYayYOSf3v1KfY1c3t3CXkcb"
 URL = f"https://drive.google.com/uc?id={DRIVE_ID}"
+
 # Verifica si el modelo existe localmente; si no, lo descarga
 if not os.path.exists(MODEL_PATH):
     try:
@@ -39,29 +39,30 @@ if not os.path.exists(MODEL_PATH):
         print("Por favor, verifica tu conexión o el enlace de Google Drive.")
         exit(1)
 
-    # Intenta cargar el modelo
-    try:
-         print("🧠 Cargando modelo...")
-         modelo = load_model(MODEL_PATH)
-         print("✅ Modelo cargado correctamente.")
-    except Exception as e:
-            print(f"❌ Error al cargar el modelo: {e}")
-            print("Verifica que el archivo .keras esté completo y sea compatible.")
-            exit(1)
+# Intenta cargar el modelo
+try:
+    print("🧠 Cargando modelo...")
+    modelo = load_model(MODEL_PATH)
+    print("✅ Modelo cargado correctamente.")
+except Exception as e:
+    print(f"❌ Error al cargar el modelo: {e}")
+    print("Verifica que el archivo .keras esté completo y sea compatible.")
+    exit(1)
 
 # -------------------- CONFIGURACIÓN DE FLASK --------------------
 app = Flask(__name__)
-# Carpetas para subir imágenes y guardar resultados
+
 UPLOAD_FOLDER = os.path.join(app.root_path, "static", "uploads")
 RESULT_FOLDER = os.path.join(app.root_path, "static", "resultados")
-# Crear carpetas si no existen
+
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(RESULT_FOLDER, exist_ok=True)
-# Límite de tamaño para archivos (16 MB)
+
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024
 
 print("📁 Carpetas configuradas correctamente.")
 print("🚀 Flask listo para recibir solicitudes.")
+
 # -------------------- RUTAS DE PÁGINAS --------------------
 @app.route('/')
 def index():
@@ -133,7 +134,7 @@ def analizar():
 
         print(f"✅ Predicción: {clase} ({confianza}%)")
 
-        # Retornar al frontend
+        # Retornar resultado
         return jsonify({
             "clase": clase,
             "confianza": confianza,
@@ -144,49 +145,25 @@ def analizar():
         import traceback
         print("❌ Error completo en analizar():")
         traceback.print_exc()
-        return jsonify({"error": f"No se puede procesar la imagen: {e}"}),
-
-
-        # etiquetas de salida o clases 
-        clases = ["Melanoma","Carcinoma de células basales","Carcinoma de células escamosas", "Lesión Benigna"]
-        clases = clases[indice]
-
-      
- # Retornar al frontend
-    return jsonify({
-            "clase": clases,
-            "confianza": confianza,
-            "imagen_url": f"/static/uploads/{file.filename}"
-        })
-
-         except Exception as e:
-            import traceback
-            print("❌ Error completo en analizar():")
-            traceback.print_exc()
-            return jsonify({"error": f"No se puede procesar la imagen: {e}"}), 500
-
+        return jsonify({"error": f"No se puede procesar la imagen: {e}"}), 500
 
 
 # === GENERAR PDF DESDE RESULTADOS ===
 @app.route('/generar_pdf', methods=['POST'])
 def generar_pdf():
-    # Obtener datos del cuerpo de la solicitud
     data = request.get_json()
     if not data:
         return jsonify({'error': 'No se recibieron datos para el PDF'}), 400
 
-    # Extraer datos del JSON recibido
     clase = data.get('clase', 'Desconocida')
     confianza = data.get('confianza', 0)
     imagen_url = data.get('imagen_url', '')
 
-    # Crear un buffer para almacenar el PDF en memoria
     buffer = BytesIO()
     pdf = canvas.Canvas(buffer, pagesize=A4)
     pdf.setTitle("Resultado de Análisis")
 
-
-    # Título del PDF
+    # Título
     pdf.setFont("Helvetica-Bold", 16)
     pdf.drawString(100, 750, "Resultado de Análisis")
 
@@ -202,7 +179,6 @@ def generar_pdf():
     # Imagen analizada
     pdf.drawString(100, 610, "Imagen analizada:")
 
-    # Intentar agregar la imagen al PDF
     try:
         if imagen_url:
             image_path = imagen_url.replace("/", os.sep).lstrip(os.sep)
@@ -211,12 +187,10 @@ def generar_pdf():
     except Exception as e:
         print("No se pudo agregar la imagen al PDF:", e)
 
-    # Finalizar el PDF
     pdf.showPage()
     pdf.save()
     buffer.seek(0)
 
-    # Enviar el archivo como descarga
     return send_file(
         buffer,
         as_attachment=True,
@@ -228,7 +202,9 @@ def generar_pdf():
 # -------------------- MAIN --------------------
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
-    app.run(debug=True, host="0.0.0.0", port=os.getenv("PORT", default=5000))
+    app.run(debug=True, host="0.0.0.0", port=port)
+
+
 
 
 
