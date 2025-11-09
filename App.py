@@ -57,8 +57,8 @@ except Exception as e:
 app = Flask(__name__)
 
 # Carpetas para subir imágenes y guardar resultados
-UPLOAD_FOLDER = os.path.join("static", "uploads")
-RESULT_FOLDER = os.path.join("static", "resultados")
+UPLOAD_FOLDER = os.path.join(app.root_path, "static", "uploads")
+RESULT_FOLDER = os.path.join(app.root_path, "static", "resultados")
 
 # Crear carpetas si no existen
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -133,11 +133,10 @@ def analizar():
         })
 
     except Exception as e:
-        import traceback
-        print("❌ Error completo:")
-        traceback.print_exc()
-        return jsonify({"error": str(e)}), 500
-
+    import traceback
+    print("❌ Error completo en analizar():")
+    traceback.print_exc()
+    return jsonify({"error": f"No se puede procesar la imagen: {str(e)}"}), 500
 
 
 
@@ -203,6 +202,7 @@ def generar_pdf():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(debug=True, host="0.0.0.0", port=os.getenv("PORT", default=5000))
+
 
 
 
