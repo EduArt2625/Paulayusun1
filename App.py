@@ -144,7 +144,8 @@ def analizar():
         import traceback
         print("❌ Error completo en analizar():")
         traceback.print_exc()
-        return jsonify({"error": f"No se puede procesar la imagen: {e}"}), 500
+        return jsonify({"error": f"No se puede procesar la imagen: {e}"}),
+
 
         # etiquetas de salida o clases 
         clases = ["Melanoma","Carcinoma de células basales","Carcinoma de células escamosas", "Lesión Benigna"]
@@ -228,6 +229,7 @@ def generar_pdf():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(debug=True, host="0.0.0.0", port=os.getenv("PORT", default=5000))
+
 
 
 
