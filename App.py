@@ -19,26 +19,6 @@ from keras.models import load_model
 MODEL_PATH = os.path.join(os.getcwd(), "modelo", "modelo_final_inceptionv3.keras")
 
 # ID de Google Drive (reemplázalo por el tuyo si cambia)
-DRIVE_ID …
-from flask import Flask, request, jsonify, render_template, send_file
-import os
-import time
-from datetime import datetime
-from io import BytesIO
-from fpdf import FPDF
-import tensorflow as tf
-from tensorflow.keras.models import load_model, Model
-from tensorflow.keras.applications.inception_v3 import preprocess_input
-from tensorflow.keras.preprocessing import image
-import numpy as np
-from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import A4
-import gdown
-
-# -------------------- CARGA DEL MODELO --------------------
-MODEL_PATH = os.path.join(os.getcwd(), "modelo", "modelo_final_inceptionv3.keras")
-
-# ID de Google Drive (reemplázalo por el tuyo si cambia)
 DRIVE_ID = "1ff0tinkKeYayYOSf3v1KfY1c3t3CXkcb"
 URL = f"https://drive.google.com/uc?id={DRIVE_ID}"
 
@@ -218,4 +198,5 @@ def generar_pdf():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(debug=True, host="0.0.0.0", port=port)
+
 
