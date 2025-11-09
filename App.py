@@ -96,21 +96,31 @@ def terminos():
 # -------------------- RUTA DE ANÁLISIS --------------------
 @app.route("/analizar", methods=["POST"])
 def analizar():
-    if "file" not in request.files:
-        return jsonify({"error": "No se ha enviado ningún archivo."})
-
-    file = request.files["file"]
-
-    if file.filename == "":
-        return jsonify({"error": "Archivo no válido."})
-
     try:
-        # Guardar imagen subida
+        if "file" not in request.files:
+            return jsonify({"error": "No se ha enviado ningún archivo."})
+
+        file = request.files["file"]
+        if file.filename == "":
+            return jsonify({"error": "Archivo no válido."})
+
+        # Guardar archivo
         filepath = os.path.join(UPLOAD_FOLDER, file.filename)
         file.save(filepath)
 
-        # Preprocesamiento
-        img = image.load_img(filepath, target_size=(256, 256))
+        if not os.path.exists(filepath):
+            return jsonify({"error": f"El archivo no se guardó correctamente en {filepath}"}), 500
+
+        print(f"📸 Imagen guardada en: {filepath}")
+        print(f"📏 Tamaño del archivo: {os.path.getsize(filepath)} bytes")
+
+        # Intentar abrir la imagen
+        try:
+            img = image.load_img(filepath, target_size=(256, 256))
+        except Exception as e:
+            print("⚠️ Error al abrir la imagen:", e)
+            return jsonify({"error": f"No se puede abrir la imagen: {e}"}), 500
+
         img_array = image.img_to_array(img)
         img_array = np.expand_dims(img_array, axis=0)
         img_array = img_array / 255.0
@@ -119,6 +129,23 @@ def analizar():
         pred = modelo.predict(img_array)
         indice = np.argmax(pred)
         confianza = round(float(np.max(pred)) * 100, 2)
+
+        clases = ["Melanoma", "Carcinoma de células basales", "Carcinoma de células escamosas", "Lesión Benigna"]
+        clase = clases[indice]
+
+        print(f"✅ Predicción: {clase} ({confianza}%)")
+
+        return jsonify({
+            "clase": clase,
+            "confianza": confianza,
+            "imagen_url": f"/static/uploads/{file.filename}"
+        })
+
+    except Exception as e:
+        import traceback
+        print("❌ Error completo en analizar():")
+        traceback.print_exc()
+        return jsonify({"error": f"No se puede procesar la imagen: {e}"}), 500
 
         # etiquetas de salida o clases 
         clases = ["Melanoma","Carcinoma de células basales","Carcinoma de células escamosas", "Lesión Benigna"]
@@ -202,6 +229,7 @@ def generar_pdf():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(debug=True, host="0.0.0.0", port=os.getenv("PORT", default=5000))
+
 
 
 
