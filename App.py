@@ -14,7 +14,7 @@ from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
 import gdown
 from keras.models import load_model
-
+import time
 # -------------------- CARGA DEL MODELO --------------------
 MODEL_PATH = os.path.join(os.getcwd(), "modelo", "modelo_final_inceptionv3.keras")
 #ID de Google Drive
@@ -197,6 +197,7 @@ def generar_pdf():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(debug=True, host="0.0.0.0", port=port)
+
 
 
 
