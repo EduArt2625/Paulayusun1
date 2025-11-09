@@ -97,7 +97,7 @@ def analizar():
         img_array = img_array / 255.0
 
         # Predicción
-        pred = model.predict(img_array)
+        pred = modelo.predict(img_array)
         indice = np.argmax(pred)
         confianza = round(float(np.max(pred)) * 100, 2)
 
@@ -184,6 +184,7 @@ def generar_pdf():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(debug=True, host="0.0.0.0", port=os.getenv("PORT", default=5000))
+
 
 
 
