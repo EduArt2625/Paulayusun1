@@ -20,7 +20,7 @@ MODEL_PATH = os.path.join(os.getcwd(), "modelo", "modelo_final_inceptionv3.keras
 
 # ID de Google Drive (reemplázalo por el tuyo si cambia)
 DRIVE_ID …
-[17:57, 9/11/2025] Pedro Martinez: from flask import Flask, request, jsonify, render_template, send_file
+from flask import Flask, request, jsonify, render_template, send_file
 import os
 import time
 from datetime import datetime
@@ -218,3 +218,4 @@ def generar_pdf():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(debug=True, host="0.0.0.0", port=port)
+
