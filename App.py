@@ -87,14 +87,18 @@ def terminos():
 @app.route("/analizar", methods=["POST"])
 def analizar():
     try:
+        # Verificar que haya archivo
         if "file" not in request.files:
             return jsonify({"error": "No se ha enviado ningún archivo."})
+        
         file = request.files["file"]
         if file.filename == "":
             return jsonify({"error": "Archivo no válido."})
+        
         # Guardar archivo
         filepath = os.path.join(UPLOAD_FOLDER, file.filename)
         file.save(filepath)
+
         if not os.path.exists(filepath):
             return jsonify({"error": f"El archivo no se guardó correctamente en {filepath}"}), 500
 
@@ -107,14 +111,18 @@ def analizar():
         except Exception as e:
             print("⚠️ Error al abrir la imagen:", e)
             return jsonify({"error": f"No se puede abrir la imagen: {e}"}), 500
+
+        # Preprocesar la imagen
         img_array = image.img_to_array(img)
         img_array = np.expand_dims(img_array, axis=0)
         img_array = img_array / 255.0
-       
-        # Predicción
+
+        # Realizar predicción
         pred = modelo.predict(img_array)
         indice = np.argmax(pred)
         confianza = round(float(np.max(pred)) * 100, 2)
+
+        # Clases del modelo
         clases = [
             "Melanoma",
             "Carcinoma de células basales",
@@ -122,25 +130,10 @@ def analizar():
             "Lesión Benigna"
         ]
         clase = clases[indice]
-        print(f"✅ Predicción: {clase} ({confianza}%)")
-
-        return jsonify({
-            "clase": clase,
-            "confianza": confianza,
-            "imagen_url": f"/static/uploads/{file.filename}"
-        })
-
-    except Exception as e:
-        import traceback
-        print("❌ Error completo en analizar():")
-        traceback.print_exc()
-        return jsonify({"error": f"No se puede procesar la imagen: {e}"}), 500
-
-        clases = ["Melanoma", "Carcinoma de células basales", "Carcinoma de células escamosas", "Lesión Benigna"]
-        clase = clases[indice]
 
         print(f"✅ Predicción: {clase} ({confianza}%)")
 
+        # Retornar al frontend
         return jsonify({
             "clase": clase,
             "confianza": confianza,
@@ -442,6 +435,7 @@ def generar_pdf():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(debug=True, host="0.0.0.0", port=os.getenv("PORT", default=5000))
+
 
 
 
