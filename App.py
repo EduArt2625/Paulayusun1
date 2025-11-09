@@ -19,6 +19,26 @@ from keras.models import load_model
 MODEL_PATH = os.path.join(os.getcwd(), "modelo", "modelo_final_inceptionv3.keras")
 
 # ID de Google Drive (reemplázalo por el tuyo si cambia)
+DRIVE_ID …
+[17:57, 9/11/2025] Pedro Martinez: from flask import Flask, request, jsonify, render_template, send_file
+import os
+import time
+from datetime import datetime
+from io import BytesIO
+from fpdf import FPDF
+import tensorflow as tf
+from tensorflow.keras.models import load_model, Model
+from tensorflow.keras.applications.inception_v3 import preprocess_input
+from tensorflow.keras.preprocessing import image
+import numpy as np
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import A4
+import gdown
+
+# -------------------- CARGA DEL MODELO --------------------
+MODEL_PATH = os.path.join(os.getcwd(), "modelo", "modelo_final_inceptionv3.keras")
+
+# ID de Google Drive (reemplázalo por el tuyo si cambia)
 DRIVE_ID = "1ff0tinkKeYayYOSf3v1KfY1c3t3CXkcb"
 URL = f"https://drive.google.com/uc?id={DRIVE_ID}"
 
@@ -42,8 +62,9 @@ if not os.path.exists(MODEL_PATH):
 # Intenta cargar el modelo
 try:
     print("🧠 Cargando modelo...")
+    start = time.time()
     modelo = load_model(MODEL_PATH)
-    print("✅ Modelo cargado correctamente.")
+    print(f"✅ Modelo cargado correctamente en {time.time() - start:.2f} segundos.")
 except Exception as e:
     print(f"❌ Error al cargar el modelo: {e}")
     print("Verifica que el archivo .keras esté completo y sea compatible.")
@@ -88,7 +109,6 @@ def terminos():
 @app.route("/analizar", methods=["POST"])
 def analizar():
     try:
-        # Verificar que haya archivo
         if "file" not in request.files:
             return jsonify({"error": "No se ha enviado ningún archivo."})
         
@@ -106,24 +126,26 @@ def analizar():
         print(f"📸 Imagen guardada en: {filepath}")
         print(f"📏 Tamaño del archivo: {os.path.getsize(filepath)} bytes")
 
-        # Intentar abrir la imagen
+        # Cargar imagen y preprocesar para InceptionV3
         try:
-            img = image.load_img(filepath, target_size=(256, 256))
+            img = image.load_img(filepath, target_size=(299, 299))
         except Exception as e:
             print("⚠️ Error al abrir la imagen:", e)
             return jsonify({"error": f"No se puede abrir la imagen: {e}"}), 500
 
-        # Preprocesar la imagen
         img_array = image.img_to_array(img)
         img_array = np.expand_dims(img_array, axis=0)
-        img_array = img_array / 255.0
+        img_array = preprocess_input(img_array)
 
-        # Realizar predicción
+        # Predicción
+        print("🔍 Realizando predicción...")
+        start_pred = time.time()
         pred = modelo.predict(img_array)
+        print(f"⏱️ Predicción completada en {time.time() - start_pred:.2f} segundos.")
+
         indice = np.argmax(pred)
         confianza = round(float(np.max(pred)) * 100, 2)
 
-        # Clases del modelo
         clases = [
             "Melanoma",
             "Carcinoma de células basales",
@@ -132,9 +154,9 @@ def analizar():
         ]
         clase = clases[indice]
 
-        print(f"✅ Predicción: {clase} ({confianza}%)")
+        print(f"✅ Resultado: {clase} ({confianza}%)")
 
-        # Retornar resultado
+        # Respuesta JSON al frontend
         return jsonify({
             "clase": clase,
             "confianza": confianza,
@@ -147,8 +169,7 @@ def analizar():
         traceback.print_exc()
         return jsonify({"error": f"No se puede procesar la imagen: {e}"}), 500
 
-
-# === GENERAR PDF DESDE RESULTADOS ===
+# -------------------- GENERAR PDF --------------------
 @app.route('/generar_pdf', methods=['POST'])
 def generar_pdf():
     data = request.get_json()
@@ -163,29 +184,24 @@ def generar_pdf():
     pdf = canvas.Canvas(buffer, pagesize=A4)
     pdf.setTitle("Resultado de Análisis")
 
-    # Título
     pdf.setFont("Helvetica-Bold", 16)
     pdf.drawString(100, 750, "Resultado de Análisis")
 
-    # Información principal
     pdf.setFont("Helvetica", 12)
     pdf.drawString(100, 710, f"Clase detectada: {clase}")
     pdf.drawString(100, 690, f"Nivel de confianza: {confianza}%")
 
-    # Fecha del análisis
     pdf.drawString(100, 650, "Fecha del análisis:")
     pdf.drawString(250, 650, datetime.now().strftime("%Y-%m-%d %H:%M:%S"))
 
-    # Imagen analizada
     pdf.drawString(100, 610, "Imagen analizada:")
-
     try:
         if imagen_url:
             image_path = imagen_url.replace("/", os.sep).lstrip(os.sep)
             if os.path.exists(image_path):
                 pdf.drawImage(image_path, 100, 400, width=200, height=200)
     except Exception as e:
-        print("No se pudo agregar la imagen al PDF:", e)
+        print("⚠️ No se pudo agregar la imagen al PDF:", e)
 
     pdf.showPage()
     pdf.save()
@@ -197,7 +213,6 @@ def generar_pdf():
         download_name="Resultado_Analisis.pdf",
         mimetype='application/pdf'
     )
-
 
 # -------------------- MAIN --------------------
 if __name__ == "__main__":
