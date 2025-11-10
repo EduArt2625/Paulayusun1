@@ -1,6 +1,8 @@
 (() => {
+  // Variable privada para evitar duplicación
   let escaneoInicializado = false;
 
+  // Espera a que el DOM esté listo
   if (document.readyState === "loading") {
     document.addEventListener("DOMContentLoaded", iniciarEscaneo);
   } else {
@@ -8,7 +10,7 @@
   }
 
   function iniciarEscaneo() {
-    if (escaneoInicializado) return;
+    if (escaneoInicializado) return; // Evita duplicar listeners
     escaneoInicializado = true;
 
     const uploadBtn = document.getElementById("uploadBtn");
@@ -21,9 +23,11 @@
 
     if (!uploadBtn || !fileInput) return;
 
-    uploadBtn.addEventListener("click", () => fileInput.click());
+    // --- BOTÓN DE CARGA ---
+    uploadBtn.addEventListener("click", () => fileInput.click(), { once: true });
 
-    fileInput.addEventListener("change", function () {
+    // --- VISTA PREVIA ---
+    fileInput.addEventListener("change", function handleFileChange() {
       const file = this.files[0];
       if (file) {
         const reader = new FileReader();
@@ -39,6 +43,7 @@
       }
     });
 
+    // --- ANÁLISIS ---
     analyzeBtn.addEventListener("click", async () => {
       const file = fileInput.files[0];
       if (!file) return alert("Primero selecciona un archivo.");
@@ -54,8 +59,8 @@
         const response = await fetch("/analizar", { method: "POST", body: formData });
         if (!response.ok) throw new Error("Error al analizar el archivo");
         const data = await response.json();
-        progress.style.width = "100%";
 
+        progress.style.width = "100%";
         resultadoDiv.innerHTML = `
           <div class="alert alert-success mt-3">
             <h4>✅ Resultado del análisis:</h4>
@@ -76,3 +81,5 @@
     });
   }
 })();
+
+   
