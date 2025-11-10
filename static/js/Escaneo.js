@@ -1,13 +1,12 @@
 
-
 // -------------------- BOTÓN DE CARGA --------------------
-document.getElementById("uploadBtn").addEventListener("click", () => {
-  const fileInput = document.getElementById("fileInput");
+document.getElementById("btn-analizar").addEventListener("click", () => {
+  const fileInput = document.getElementById("file");
   fileInput.click();
 });
 
 // -------------------- VISTA PREVIA DE IMAGEN --------------------
-document.getElementById("fileInput").addEventListener("change", function () {
+document.getElementById("file").addEventListener("change", function () {
   const file = this.files[0];
   if (file) {
     const reader = new FileReader();
@@ -15,15 +14,15 @@ document.getElementById("fileInput").addEventListener("change", function () {
       const preview = document.getElementById("preview");
       preview.src = e.target.result;
       preview.style.display = "block";
-      document.getElementById("analyzeBtn").disabled = false;
+      document.getElementById("btn-analizar").disabled = false;
     };
     reader.readAsDataURL(file);
   }
 });
 
 // -------------------- ENVÍO AL BACKEND --------------------
-document.getElementById("analyzeBtn").addEventListener("click", async () => {
-  const fileInput = document.getElementById("fileInput");
+document.getElementById("btn-analizar").addEventListener("click", async () => {
+  const fileInput = document.getElementById("file");
   const file = fileInput.files[0];
 
   if (!file) {
@@ -34,15 +33,11 @@ document.getElementById("analyzeBtn").addEventListener("click", async () => {
   const formData = new FormData();
   formData.append("file", file);
 
-  const progressContainer = document.getElementById("progressContainer");
-  const progress = document.getElementById("progress");
-  progress.style.width = "0%";
-  progressContainer.style.display = "block";
+  // Indicador de carga
+  const loading = document.getElementById("loading");
+  loading.style.display = "block";
 
   try {
-    // Simular avance inicial
-    progress.style.width = "40%";
-
     const response = await fetch("/analizar", {
       method: "POST",
       body: formData,
@@ -52,12 +47,12 @@ document.getElementById("analyzeBtn").addEventListener("click", async () => {
 
     const data = await response.json();
 
+    loading.style.display = "none";
+
     if (data.error) {
       alert("❌ " + data.error);
       return;
     }
-
-    progress.style.width = "100%";
 
     // Mostrar resultado
     const resultadoDiv = document.getElementById("resultado");
@@ -67,10 +62,10 @@ document.getElementById("analyzeBtn").addEventListener("click", async () => {
       <p><strong>Confianza:</strong> ${data.confianza}%</p>
       <img src="${data.imagen_url}" alt="Imagen analizada" style="max-width: 300px; border-radius: 10px; margin-top: 10px;">
       <br><br>
-      <button id="descargarPdfBtn" class="btn-analizar"> Descargar PDF</button>
+      <button id="descargarPdfBtn" class="btn-analizar">Descargar PDF</button>
     `;
 
-    // Botón para descargar PDF
+    // -------------------- DESCARGAR PDF --------------------
     document.getElementById("descargarPdfBtn").addEventListener("click", async () => {
       try {
         const pdfResponse = await fetch("/generar_pdf", {
@@ -95,25 +90,14 @@ document.getElementById("analyzeBtn").addEventListener("click", async () => {
         a.click();
         a.remove();
         window.URL.revokeObjectURL(url);
-
-
       } catch (err) {
-        alert(" Error al descargar el PDF: " + err.message);
+        alert("⚠️ Error al descargar el PDF: " + err.message);
       }
     });
 
-
-
-    // Ocultar barra de progreso tras 2 segundos
-    setTimeout(() => {
-      progressContainer.style.display = "none";
-      progress.style.width = "0%";
-    }, 2000);
-
   } catch (error) {
     console.error(error);
-    alert("Error al analizar la imagen.");
-    progressContainer.style.display = "none";
-    progress.style.width = "0%";
+    loading.style.display = "none";
+    alert("⚠️ Error al analizar la imagen: " + error.message);
   }
 });
