@@ -1,4 +1,18 @@
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", iniciarEscaneo);
+} else {
+  iniciarEscaneo();
+}
+
+let escaneoInicializado = false;
+
 function iniciarEscaneo() {
+  if (escaneoInicializado) {
+    console.warn("⚠️ Listeners ya estaban agregados, se evita duplicación.");
+    return;
+  }
+  escaneoInicializado = true;
+
   console.log("JS Escaneo cargado correctamente ✅");
 
   const uploadBtn = document.getElementById("uploadBtn");
@@ -13,13 +27,6 @@ function iniciarEscaneo() {
     console.error("❌ No se encontró el botón o el input en el DOM.");
     return;
   }
-
-  // Evitar registrar doble evento si ya existe
-  if (uploadBtn.dataset.listenerAdded === "true") {
-    console.warn("⚠️ Listeners ya estaban agregados, se evita duplicación.");
-    return;
-  }
-  uploadBtn.dataset.listenerAdded = "true";
 
   // -------------------- BOTÓN DE CARGA --------------------
   uploadBtn.addEventListener("click", () => {
@@ -45,10 +52,55 @@ function iniciarEscaneo() {
       preview.style.display = "none";
     }
   });
-}
 
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", iniciarEscaneo);
-} else {
-  iniciarEscaneo();
+  // -------------------- ANÁLISIS --------------------
+  analyzeBtn.addEventListener("click", async () => {
+    const file = fileInput.files[0];
+    if (!file) return alert("Primero selecciona una imagen.");
+
+    console.log("🔍 Enviando imagen al servidor...");
+
+    // Mostrar progreso
+    progressContainer.style.display = "block";
+    progress.style.width = "50%";
+    analyzeBtn.disabled = true;
+
+    const formData = new FormData();
+    formData.append("imagen", file);
+
+    try {
+      const response = await fetch("/analizar", {
+        method: "POST",
+        body: formData
+      });
+
+      if (!response.ok) throw new Error("Error al analizar la imagen");
+
+      const data = await response.json();
+
+      progress.style.width = "100%";
+
+      // Mostrar resultado
+      resultadoDiv.innerHTML = `
+        <div class="alert alert-success mt-3">
+          <h4>✅ Resultado del análisis:</h4>
+          <p><strong>${data.resultado}</strong></p>
+        </div>
+      `;
+
+      console.log("🧠 Análisis recibido:", data);
+
+    } catch (err) {
+      console.error("❌ Error en el análisis:", err);
+      resultadoDiv.innerHTML = `
+        <div class="alert alert-danger mt-3">
+          Error al procesar la imagen.
+        </div>
+      `;
+    } finally {
+      progress.style.width = "0%";
+      progressContainer.style.display = "none";
+      analyzeBtn.disabled = false;
+    }
+  });
 }
