@@ -49,6 +49,20 @@
     <a href="{{ url_for('informacion') }}" class="btn btn-info" id="infoBtn">MÁS</a>
   </div>
 
+<script>
+const uploadBtn = document.getElementById("uploadBtn");
+console.log("UploadBtn encontrado:", uploadBtn);
+uploadBtn.addEventListener("click", () => {
+  console.log("Click en Cargar Imagen detectado");
+  alert("Funciona!");
+});
+</script>
+
+
+
+
+
+  
 <!-- Footer -->
 {% include 'Footer.html' %}
 
@@ -62,4 +76,5 @@
   {% include 'Footer.html' %}
 </body>
 </html>
+
 
