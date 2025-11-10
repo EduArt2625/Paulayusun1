@@ -7,20 +7,21 @@ const progressContainer = document.getElementById("progressContainer");
 const progress = document.getElementById("progress");
 const resultadoDiv = document.getElementById("resultado");
 
+console.log("JS cargado correctamente");
 
 // -------------------- BOTÓN DE CARGA --------------------
-document.getElementById("uploadBtn").addEventListener("click", () => {
-  const fileInput = document.getElementById("fileInput");
+uploadBtn.addEventListener("click", () => {
+  console.log("Click en Cargar Imagen");
   fileInput.click();
 });
 
 // -------------------- VISTA PREVIA --------------------
-fileInput.addEventListener("change", function () {
+fileInput.addEventListener("change", function() {
   const file = this.files[0];
   console.log("Archivo seleccionado:", file);
   if (file) {
     const reader = new FileReader();
-    reader.onload = function (e) {
+    reader.onload = function(e) {
       preview.src = e.target.result;
       preview.style.display = "block";
       analyzeBtn.disabled = false;
@@ -35,7 +36,7 @@ fileInput.addEventListener("change", function () {
 
 // -------------------- BOTÓN ANALIZAR --------------------
 analyzeBtn.addEventListener("click", async () => {
-  console.log("Click detectado en Analizar");
+  console.log("Click en Analizar detectado");
 
   const file = fileInput.files[0];
   if (!file) {
@@ -46,11 +47,10 @@ analyzeBtn.addEventListener("click", async () => {
   const formData = new FormData();
   formData.append("file", file);
 
-  // Mostrar barra de progreso inicial
-  progress.style.width = "0%";
+  // Mostrar barra de progreso
   progressContainer.style.display = "block";
+  progress.style.width = "0%";
 
-  // Animación simple de progreso hasta 80%
   let width = 0;
   const interval = setInterval(() => {
     if (width >= 80) clearInterval(interval);
@@ -61,10 +61,8 @@ analyzeBtn.addEventListener("click", async () => {
   try {
     const response = await fetch("/analizar", {
       method: "POST",
-      body: formData,
+      body: formData
     });
-
-    console.log("Respuesta del servidor:", response);
 
     if (!response.ok) throw new Error(`HTTP error ${response.status}`);
 
@@ -86,15 +84,14 @@ analyzeBtn.addEventListener("click", async () => {
       <h3>Resultado del análisis:</h3>
       <p><strong>Clase:</strong> ${data.clase}</p>
       <p><strong>Confianza:</strong> ${data.confianza}%</p>
-      <img src="${data.imagen_url}" alt="Imagen analizada" style="max-width: 300px; border-radius: 10px; margin-top: 10px;">
+      <img src="${data.imagen_url}" alt="Imagen analizada" style="max-width:300px; border-radius:10px; margin-top:10px;">
       <br><br>
-      <button id="descargarPdfBtn" class="btn-analizar">Descargar PDF</button>
+      <button id="descargarPdfBtn" class="btn btn-primary">Descargar PDF</button>
     `;
 
     // Descargar PDF
     const descargarPdfBtn = document.getElementById("descargarPdfBtn");
     descargarPdfBtn.addEventListener("click", async () => {
-      console.log("Click en Descargar PDF");
       try {
         const pdfResponse = await fetch("/generar_pdf", {
           method: "POST",
@@ -102,8 +99,8 @@ analyzeBtn.addEventListener("click", async () => {
           body: JSON.stringify({
             clase: data.clase,
             confianza: data.confianza,
-            imagen_url: data.imagen_url,
-          }),
+            imagen_url: data.imagen_url
+          })
         });
 
         if (!pdfResponse.ok) throw new Error("Error al generar el PDF");
@@ -135,4 +132,3 @@ analyzeBtn.addEventListener("click", async () => {
     progress.style.width = "0%";
   }
 });
-
