@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", function () {
+document.addEventListener("DOMContentLoaded", () => {
   console.log("JS cargado correctamente ✅");
 
   const uploadBtn = document.getElementById("uploadBtn");
@@ -9,6 +9,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const progress = document.getElementById("progress");
   const resultadoDiv = document.getElementById("resultado");
 
+  // Verificar si existen los elementos
   if (!uploadBtn || !fileInput) {
     console.error("❌ No se encontró el botón o input en el DOM.");
     return;
@@ -30,7 +31,7 @@ document.addEventListener("DOMContentLoaded", function () {
         preview.src = e.target.result;
         preview.style.display = "block";
         analyzeBtn.disabled = false;
-        console.log("Botón Analizar habilitado");
+        console.log("Botón Analizar habilitado ✅");
       };
       reader.readAsDataURL(file);
     } else {
