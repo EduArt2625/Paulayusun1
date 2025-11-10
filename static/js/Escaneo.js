@@ -9,29 +9,29 @@ document.addEventListener("DOMContentLoaded", () => {
   const progress = document.getElementById("progress");
   const resultadoDiv = document.getElementById("resultado");
 
-  // Verificar si existen los elementos
+  // Verificar si los elementos existen
   if (!uploadBtn || !fileInput) {
-    console.error("❌ No se encontró el botón o input en el DOM.");
+    console.error("❌ No se encontró el botón o el input en el DOM.");
     return;
   }
 
   // -------------------- BOTÓN DE CARGA --------------------
   uploadBtn.addEventListener("click", () => {
-    console.log("Click en Cargar Imagen detectado 🎯");
+    console.log("Click en Cargar Imagen");
     fileInput.click();
   });
 
   // -------------------- VISTA PREVIA --------------------
-  fileInput.addEventListener("change", function() {
+  fileInput.addEventListener("change", function () {
     const file = this.files[0];
-    console.log("Archivo seleccionado:", file);
     if (file) {
+      console.log("Archivo seleccionado:", file);
       const reader = new FileReader();
-      reader.onload = function(e) {
+      reader.onload = function (e) {
         preview.src = e.target.result;
         preview.style.display = "block";
         analyzeBtn.disabled = false;
-        console.log("Botón Analizar habilitado ✅");
+        console.log("✅ Vista previa mostrada y botón Analizar habilitado");
       };
       reader.readAsDataURL(file);
     } else {
