@@ -23,26 +23,28 @@
      <h1 class="titulo">NEODERMA</h1>
     <p>Añada una foto para comenzar</p>
 
-    <div class="contenedor">
-  <h2>🔬 Analizador de Lesiones Cutáneas</h2>
+    <!-- Botón de análisis -->
+  <button id="analyzeBtn" class="btn-analizar" disabled>Analizar</button>
 
-  <!-- Campo para seleccionar imagen (oculto) -->
-  <input type="file" id="file" accept="image/*" style="display:none;">
-
-  <!-- Imagen de vista previa -->
-  <img id="preview" src="" alt="Vista previa" style="display:none; max-width:300px; border-radius:10px; margin-top:10px;">
-
-  <!-- Botón principal -->
-  <button id="btn-analizar">🔍 Analizar Imagen</button>
-
-  <!-- Indicador de carga -->
-  <div id="loading" style="display:none; margin-top:15px;">
-    <p>🧠 Analizando imagen, por favor espera...</p>
+  <!-- Barra de progreso -->
+  <div id="progressContainer" class="progress-bar-custom" style="display: none;">
+    <div id="progress" class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%"></div>
   </div>
 
   <!-- Resultado -->
-  <div id="resultado" style="margin-top:20px;"></div>
+  <div id="resultado" class="mt-4"></div>
 </div>
+
+
+
+    <!-- Caja de información -->
+    <div class="info-box">
+      <p>Si desea conocer más información sobre las lesiones dictadas por el resultado, consulte aquí:</p>
+      <a href="{{ url_for('informacion') }}" class="btn-mas" id="infoBtn">MÁS</a>
+    </div>
+  </main>
+
+
 
 <!-- Vincular el script corregido -->
 <script src="{{ url_for('static', filename='js/Escaneo.js') }}"></script>
@@ -51,4 +53,5 @@
  
 </body>
 </html>
+
 
