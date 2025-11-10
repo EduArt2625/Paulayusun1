@@ -7,9 +7,10 @@ const progressContainer = document.getElementById("progressContainer");
 const progress = document.getElementById("progress");
 const resultadoDiv = document.getElementById("resultado");
 
+
 // -------------------- BOTÓN DE CARGA --------------------
-uploadBtn.addEventListener("click", () => {
-  console.log("Click en Cargar Imagen");
+document.getElementById("uploadBtn").addEventListener("click", () => {
+  const fileInput = document.getElementById("fileInput");
   fileInput.click();
 });
 
@@ -134,3 +135,4 @@ analyzeBtn.addEventListener("click", async () => {
     progress.style.width = "0%";
   }
 });
+
