@@ -1,55 +1,78 @@
-function iniciarEscaneo() {
-  console.log("JS Escaneo cargado correctamente ✅");
+(() => {
+  let escaneoInicializado = false;
 
-  const uploadBtn = document.getElementById("uploadBtn");
-  const fileInput = document.getElementById("fileInput");
-  const preview = document.getElementById("preview");
-  const analyzeBtn = document.getElementById("analyzeBtn");
-  const progressContainer = document.getElementById("progressContainer");
-  const progress = document.getElementById("progress");
-  const resultadoDiv = document.getElementById("resultado");
-
-  if (!uploadBtn || !fileInput) {
-    console.error("❌ No se encontró el botón o el input en el DOM.");
-    return;
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", iniciarEscaneo);
+  } else {
+    iniciarEscaneo();
   }
 
-  // Evita registrar dos veces los listeners
-  if (uploadBtn.dataset.listenerAdded === "true") {
-    console.warn("⚠️ Listeners ya estaban agregados. Evitando duplicación.");
-    return;
-  }
-  uploadBtn.dataset.listenerAdded = "true";
+  function iniciarEscaneo() {
+    if (escaneoInicializado) return;
+    escaneoInicializado = true;
 
-  // -------------------- BOTÓN DE CARGA --------------------
-  uploadBtn.addEventListener("click", () => {
-    console.log("📂 Click en Cargar Imagen");
-    fileInput.click();
-  });
+    const uploadBtn = document.getElementById("uploadBtn");
+    const fileInput = document.getElementById("fileInput");
+    const preview = document.getElementById("preview");
+    const analyzeBtn = document.getElementById("analyzeBtn");
+    const progressContainer = document.getElementById("progressContainer");
+    const progress = document.getElementById("progress");
+    const resultadoDiv = document.getElementById("resultado");
 
-  // -------------------- VISTA PREVIA --------------------
-  fileInput.addEventListener("change", function () {
-    const file = this.files[0];
-    if (file) {
-      console.log("📸 Archivo seleccionado:", file.name);
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        preview.src = e.target.result;
-        preview.style.display = "block";
-        analyzeBtn.disabled = false;
-        console.log("✅ Vista previa mostrada y botón Analizar habilitado");
-      };
-      reader.readAsDataURL(file);
-    } else {
+    if (!uploadBtn || !fileInput) return;
+
+    uploadBtn.addEventListener("click", () => fileInput.click());
+
+    fileInput.addEventListener("change", function () {
+      const file = this.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          preview.src = e.target.result;
+          preview.style.display = "block";
+          analyzeBtn.disabled = false;
+        };
+        reader.readAsDataURL(file);
+      } else {
+        analyzeBtn.disabled = true;
+        preview.style.display = "none";
+      }
+    });
+
+    analyzeBtn.addEventListener("click", async () => {
+      const file = fileInput.files[0];
+      if (!file) return alert("Primero selecciona un archivo.");
+
+      progressContainer.style.display = "block";
+      progress.style.width = "50%";
       analyzeBtn.disabled = true;
-      preview.style.display = "none";
-    }
-  });
-}
 
-// Asegura ejecución única
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", iniciarEscaneo, { once: true });
-} else {
-  iniciarEscaneo();
-}
+      const formData = new FormData();
+      formData.append("file", file);
+
+      try {
+        const response = await fetch("/analizar", { method: "POST", body: formData });
+        if (!response.ok) throw new Error("Error al analizar el archivo");
+        const data = await response.json();
+        progress.style.width = "100%";
+
+        resultadoDiv.innerHTML = `
+          <div class="alert alert-success mt-3">
+            <h4>✅ Resultado del análisis:</h4>
+            <p><strong>${data.resultado}</strong></p>
+          </div>
+        `;
+      } catch (err) {
+        resultadoDiv.innerHTML = `
+          <div class="alert alert-danger mt-3">
+            Error al procesar el archivo.
+          </div>
+        `;
+      } finally {
+        progress.style.width = "0%";
+        progressContainer.style.display = "none";
+        analyzeBtn.disabled = false;
+      }
+    });
+  }
+})();
