@@ -1,5 +1,6 @@
 document.addEventListener("DOMContentLoaded", () => {
-  // -------------------- ELEMENTOS --------------------
+  console.log("JS cargado correctamente");
+
   const uploadBtn = document.getElementById("uploadBtn");
   const fileInput = document.getElementById("fileInput");
   const preview = document.getElementById("preview");
@@ -7,8 +8,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const progressContainer = document.getElementById("progressContainer");
   const progress = document.getElementById("progress");
   const resultadoDiv = document.getElementById("resultado");
-
-  console.log("JS cargado correctamente");
 
   // -------------------- BOTÓN DE CARGA --------------------
   uploadBtn.addEventListener("click", () => {
@@ -134,3 +133,5 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
+
+
