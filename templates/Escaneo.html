@@ -1,1 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Escaneo de Lesiones</title>
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Estilos locales -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/Navbar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/Global.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/Escaneo.css') }}">
+</head>
+<body>
+
+  <!-- Navbar -->
+  {% include 'Navbar.html' %}
+
+  <div class="container text-center mt-4">
+    <h1 class="titulo">NEODERMA</h1>
+    <p>Añada una foto para comenzar</p>
+
+    <!-- Botón para cargar imagen -->
+    <button id="uploadBtn" class="btn btn-primary">Cargar imagen</button>
+    <input type="file" id="fileInput" accept="image/*" hidden>
+
+    <!-- Vista previa -->
+    <div class="preview-container mt-3">
+      <img id="preview" src="" alt="Vista previa" style="display:none; max-width: 300px; border-radius: 10px;">
+    </div>
+
+    <!-- Botón de análisis -->
+    <button id="analyzeBtn" class="btn btn-success mt-3" disabled>Analizar</button>
+
+    <!-- Barra de progreso -->
+    <div id="progressContainer" class="progress mt-3" style="display:none; height: 25px;">
+      <div id="progress" class="progress-bar progress-bar-striped progress-bar-animated" style="width: 0%;"></div>
+    </div>
+
+    <!-- Resultado -->
+    <div id="resultado" class="mt-4"></div>
+  </div>
+
+  <!-- Información adicional -->
+  <div class="info-box mt-4 text-center">
+    <p>Si desea conocer más información sobre las lesiones dictadas por el resultado, consulte aquí:</p>
+    <a href="{{ url_for('informacion') }}" class="btn btn-info" id="infoBtn">MÁS</a>
+  </div>
+
+  <!-- Footer -->
+{% include 'Footer.html' %}
+
+<!-- Scripts al final del body -->
+<script src="{{ url_for('static', filename='js/Escaneo.js') }}"></script>
+</body>
+</html>
 
