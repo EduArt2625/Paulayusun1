@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Información Adicional - NeoDerma</title>
+
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+
+  <!-- Estilos personalizados -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/Navbar.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/Global.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/Informacion_adicional.css') }}" />
+  
+</head>
+<body>
+
+  <!-- Navbar -->
+  {% include 'Navbar.html' %}
+
+  <!-- Contenido principal con clase especial para flex -->
+  <main class="contenido-principal container-fluid mt-4">
+    <h2 class="text-center titulo-principal">FUNDAMENTO MÉDICO Y RECOMENDACIONES GENERALES</h2>
+
+    <div class="row mt-4">
+      <!-- Menú lateral -->
+      <div class="col-md-3 text-center">
+        <div class="menu-lesiones">
+          <button class="btn btn-info w-100 mb-2" onclick="mostrarInfo('melanoma')">Melanoma</button>
+          <button class="btn btn-info w-100 mb-2" onclick="mostrarInfo('basocelular')">Carcinoma de células basales</button>
+          <button class="btn btn-info w-100 mb-2" onclick="mostrarInfo('escamoso')">Carcinoma de células escamosas</button>
+          <button class="btn btn-info w-100 mb" onclick="mostrarInfo('benignas')">Lesiones benignas</button>
+        </div>
+      </div>
+
+      <!-- Área de información -->
+      <div class="col-md-9">
+        <div id="info-lesion" class="info-box">
+          <h3 id="nombre-lesion" class="fw-bold text-center">Nombre lesión</h3>
+          
+          <p class="fw-bold">Informacion de la patogenesis:</p>
+          
+          <img id="imagen-lesion"   class="img-fluid mx-auto d-block mb-3" style="max-width: 200px;" />
+          <p id="recomendaciones" class="fw-bold">Recomendaciones generales.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+ 
+
+  <!-- Footer -->
+  {% include 'Footer.html' %}
+  
+    
+  </script>
+
+  <!-- JS personalizado -->
+    <script src="{{ url_for('static', filename='js/Informacion_adicional.js') }}"></script>
+  
+
+</body>
+</html>
