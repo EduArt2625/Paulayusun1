@@ -18,12 +18,12 @@
   <!-- Navbar -->
   {% include 'Navbar.html' %}
 
-  <div class="container text-center">
+  <div class="container text-center mt-4">
     <h1 class="titulo">NEODERMA</h1>
     <p>Añada una foto para comenzar</p>
 
     <!-- Botón para cargar imagen -->
-    <button id="uploadBtn" class="btn-cargar">Cargar imagen</button>
+    <button id="uploadBtn" class="btn-cargar btn btn-primary">Cargar imagen</button>
     <input type="file" id="fileInput" accept="image/*" hidden>
 
     <!-- Vista previa -->
@@ -33,7 +33,7 @@
     </div>
 
     <!-- Botón de análisis -->
-    <button id="analyzeBtn" class="btn-analizar mt-3" disabled>Analizar</button>
+    <button id="analyzeBtn" class="btn-analizar btn btn-success mt-3" disabled>Analizar</button>
 
     <!-- Barra de progreso -->
     <div id="progressContainer" class="progress mt-3" style="display:none; height: 25px;">
@@ -46,5 +46,14 @@
     <!-- Caja de información -->
     <div class="info-box mt-4">
       <p>Si desea conocer más información sobre las lesiones dictadas por el resultado, consulte aquí:</p>
-      <a href="{{ url_for('informacion') }}" class="btn-mas" id="infoBtn">MÁS</a>
+      <a href="{{ url_for('informacion') }}" class="btn btn-info" id="infoBtn">MÁS</a>
     </div>
+  </div>
+
+  <!-- Footer -->
+  {% include 'Footer.html' %}
+
+  <!-- Script del escaneo -->
+  <script src="{{ url_for('static', filename='js/Escaneo.js') }}"></script>
+</body>
+</html>
