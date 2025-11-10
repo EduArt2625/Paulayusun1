@@ -1,15 +1,5 @@
-// Espera a que el DOM esté listo
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", iniciarEscaneo);
-} else {
-  iniciarEscaneo();
-}
-
-let escaneoInicializado = false;
-
 function iniciarEscaneo() {
-  if (escaneoInicializado) return; // Evita duplicar listeners
-  escaneoInicializado = true;
+  console.log("JS Escaneo cargado correctamente ✅");
 
   const uploadBtn = document.getElementById("uploadBtn");
   const fileInput = document.getElementById("fileInput");
@@ -20,22 +10,34 @@ function iniciarEscaneo() {
   const resultadoDiv = document.getElementById("resultado");
 
   if (!uploadBtn || !fileInput) {
-    console.error("No se encontró el botón o input de archivo en el DOM.");
+    console.error("❌ No se encontró el botón o el input en el DOM.");
     return;
   }
 
-  // --- BOTÓN DE CARGA ---
-  uploadBtn.addEventListener("click", () => fileInput.click());
+  // Evita registrar dos veces los listeners
+  if (uploadBtn.dataset.listenerAdded === "true") {
+    console.warn("⚠️ Listeners ya estaban agregados. Evitando duplicación.");
+    return;
+  }
+  uploadBtn.dataset.listenerAdded = "true";
 
-  // --- VISTA PREVIA ---
+  // -------------------- BOTÓN DE CARGA --------------------
+  uploadBtn.addEventListener("click", () => {
+    console.log("📂 Click en Cargar Imagen");
+    fileInput.click();
+  });
+
+  // -------------------- VISTA PREVIA --------------------
   fileInput.addEventListener("change", function () {
     const file = this.files[0];
     if (file) {
+      console.log("📸 Archivo seleccionado:", file.name);
       const reader = new FileReader();
       reader.onload = function (e) {
         preview.src = e.target.result;
         preview.style.display = "block";
         analyzeBtn.disabled = false;
+        console.log("✅ Vista previa mostrada y botón Analizar habilitado");
       };
       reader.readAsDataURL(file);
     } else {
@@ -43,48 +45,11 @@ function iniciarEscaneo() {
       preview.style.display = "none";
     }
   });
+}
 
-  // --- ANÁLISIS ---
-  analyzeBtn.addEventListener("click", async () => {
-    const file = fileInput.files[0];
-    if (!file) return alert("Primero selecciona un archivo.");
-
-    progressContainer.style.display = "block";
-    progress.style.width = "50%";
-    analyzeBtn.disabled = true;
-
-    const formData = new FormData();
-    formData.append("file", file); // clave "file"
-
-    try {
-      const response = await fetch("/analizar", {
-        method: "POST",
-        body: formData
-      });
-
-      if (!response.ok) throw new Error("Error al analizar el archivo");
-
-      const data = await response.json();
-
-      progress.style.width = "100%";
-
-      resultadoDiv.innerHTML = `
-        <div class="alert alert-success mt-3">
-          <h4>✅ Resultado del análisis:</h4>
-          <p><strong>${data.resultado}</strong></p>
-        </div>
-      `;
-    } catch (err) {
-      console.error("Error en el análisis:", err);
-      resultadoDiv.innerHTML = `
-        <div class="alert alert-danger mt-3">
-          Error al procesar el archivo.
-        </div>
-      `;
-    } finally {
-      progress.style.width = "0%";
-      progressContainer.style.display = "none";
-      analyzeBtn.disabled = false;
-    }
-  });
+// Asegura ejecución única
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", iniciarEscaneo, { once: true });
+} else {
+  iniciarEscaneo();
 }
