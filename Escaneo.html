@@ -50,10 +50,11 @@
   </div>
 
   <!-- Footer -->
-  {% include 'Footer.html' %}
+{% include 'Footer.html' %}
 
- <script src="{{ url_for('static', filename='js/Escaneo.js') }}"></script>
-
+<!-- Scripts al final del body -->
+<script src="{{ url_for('static', filename='js/Escaneo.js') }}"></script>
 </body>
 </html>
+
 
