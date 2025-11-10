@@ -1,10 +1,12 @@
+
 // -------------------- BOTÓN DE CARGA --------------------
-document.getElementById("btn-cargar").addEventListener("click", () => {
-  document.getElementById("file").click();
+document.getElementById("uploadBtn").addEventListener("click", () => {
+  const fileInput = document.getElementById("fileInput");
+  fileInput.click();
 });
 
 // -------------------- VISTA PREVIA DE IMAGEN --------------------
-document.getElementById("file").addEventListener("change", function () {
+document.getElementById("fileInput").addEventListener("change", function () {
   const file = this.files[0];
   if (file) {
     const reader = new FileReader();
@@ -12,15 +14,15 @@ document.getElementById("file").addEventListener("change", function () {
       const preview = document.getElementById("preview");
       preview.src = e.target.result;
       preview.style.display = "block";
-      document.getElementById("btn-analizar").disabled = false;
+      document.getElementById("analyzeBtn").disabled = false;
     };
     reader.readAsDataURL(file);
   }
 });
 
 // -------------------- ENVÍO AL BACKEND --------------------
-document.getElementById("btn-analizar").addEventListener("click", async () => {
-  const fileInput = document.getElementById("file");
+document.getElementById("analyzeBtn").addEventListener("click", async () => {
+  const fileInput = document.getElementById("fileInput");
   const file = fileInput.files[0];
 
   if (!file) {
@@ -32,39 +34,42 @@ document.getElementById("btn-analizar").addEventListener("click", async () => {
   formData.append("file", file);
 
   const progressContainer = document.getElementById("progressContainer");
-  const progressBar = document.getElementById("progress");
+  const progress = document.getElementById("progress");
+  progress.style.width = "0%";
   progressContainer.style.display = "block";
-  progressBar.style.width = "30%";
 
   try {
+    // Simular avance inicial
+    progress.style.width = "40%";
+
     const response = await fetch("/analizar", {
       method: "POST",
       body: formData,
     });
 
-    progressBar.style.width = "70%";
-
     if (!response.ok) throw new Error("Error en el servidor");
-    const data = await response.json();
 
-    progressBar.style.width = "100%";
+    const data = await response.json();
 
     if (data.error) {
       alert("❌ " + data.error);
       return;
     }
 
+    progress.style.width = "100%";
+
+    // Mostrar resultado
     const resultadoDiv = document.getElementById("resultado");
     resultadoDiv.innerHTML = `
       <h3>Resultado del análisis:</h3>
       <p><strong>Clase:</strong> ${data.clase}</p>
       <p><strong>Confianza:</strong> ${data.confianza}%</p>
-      <img src="${data.imagen_url}" alt="Imagen analizada" class="img-fluid rounded mt-3" style="max-width: 300px;">
+      <img src="${data.imagen_url}" alt="Imagen analizada" style="max-width: 300px; border-radius: 10px; margin-top: 10px;">
       <br><br>
-      <button id="descargarPdfBtn" class="btn btn-outline-primary">Descargar PDF</button>
+      <button id="descargarPdfBtn" class="btn-analizar"> Descargar PDF</button>
     `;
 
-    // -------------------- DESCARGAR PDF --------------------
+    // Botón para descargar PDF
     document.getElementById("descargarPdfBtn").addEventListener("click", async () => {
       try {
         const pdfResponse = await fetch("/generar_pdf", {
@@ -79,6 +84,7 @@ document.getElementById("btn-analizar").addEventListener("click", async () => {
 
         if (!pdfResponse.ok) throw new Error("Error al generar el PDF");
 
+        // Crear descarga del PDF
         const blob = await pdfResponse.blob();
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement("a");
@@ -88,16 +94,25 @@ document.getElementById("btn-analizar").addEventListener("click", async () => {
         a.click();
         a.remove();
         window.URL.revokeObjectURL(url);
+
+
       } catch (err) {
-        alert("⚠️ Error al descargar el PDF: " + err.message);
+        alert(" Error al descargar el PDF: " + err.message);
       }
     });
+
+
+
+    // Ocultar barra de progreso tras 2 segundos
+    setTimeout(() => {
+      progressContainer.style.display = "none";
+      progress.style.width = "0%";
+    }, 2000);
+
   } catch (error) {
     console.error(error);
-    alert("⚠️ Error al analizar la imagen: " + error.message);
-  } finally {
-    progressBar.style.width = "0%";
+    alert("Error al analizar la imagen.");
     progressContainer.style.display = "none";
+    progress.style.width = "0%";
   }
 });
-
