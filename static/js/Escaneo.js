@@ -56,9 +56,9 @@ function iniciarEscaneo() {
   // -------------------- ANÁLISIS --------------------
   analyzeBtn.addEventListener("click", async () => {
     const file = fileInput.files[0];
-    if (!file) return alert("Primero selecciona una imagen.");
+    if (!file) return alert("Primero selecciona un archivo.");
 
-    console.log("🔍 Enviando imagen al servidor...");
+    console.log("🔍 Enviando archivo al servidor...");
 
     // Mostrar progreso
     progressContainer.style.display = "block";
@@ -66,7 +66,7 @@ function iniciarEscaneo() {
     analyzeBtn.disabled = true;
 
     const formData = new FormData();
-    formData.append("imagen", file);
+    formData.append("file", file); // <-- cambio aquí: "imagen" → "file"
 
     try {
       const response = await fetch("/analizar", {
@@ -74,33 +74,4 @@ function iniciarEscaneo() {
         body: formData
       });
 
-      if (!response.ok) throw new Error("Error al analizar la imagen");
-
-      const data = await response.json();
-
-      progress.style.width = "100%";
-
-      // Mostrar resultado
-      resultadoDiv.innerHTML = `
-        <div class="alert alert-success mt-3">
-          <h4>✅ Resultado del análisis:</h4>
-          <p><strong>${data.resultado}</strong></p>
-        </div>
-      `;
-
-      console.log("🧠 Análisis recibido:", data);
-
-    } catch (err) {
-      console.error("❌ Error en el análisis:", err);
-      resultadoDiv.innerHTML = `
-        <div class="alert alert-danger mt-3">
-          Error al procesar la imagen.
-        </div>
-      `;
-    } finally {
-      progress.style.width = "0%";
-      progressContainer.style.display = "none";
-      analyzeBtn.disabled = false;
-    }
-  });
-}
+      if (!response.ok) throw new Error("Error al analizar el arc
