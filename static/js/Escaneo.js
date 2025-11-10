@@ -1,9 +1,3 @@
-if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", iniciarEscaneo);
-} else {
-  iniciarEscaneo();
-}
-
 function iniciarEscaneo() {
   console.log("JS Escaneo cargado correctamente ✅");
 
@@ -20,6 +14,13 @@ function iniciarEscaneo() {
     return;
   }
 
+  // Evitar registrar doble evento si ya existe
+  if (uploadBtn.dataset.listenerAdded === "true") {
+    console.warn("⚠️ Listeners ya estaban agregados, se evita duplicación.");
+    return;
+  }
+  uploadBtn.dataset.listenerAdded = "true";
+
   // -------------------- BOTÓN DE CARGA --------------------
   uploadBtn.addEventListener("click", () => {
     console.log("Click en Cargar Imagen");
@@ -30,7 +31,7 @@ function iniciarEscaneo() {
   fileInput.addEventListener("change", function () {
     const file = this.files[0];
     if (file) {
-      console.log("Archivo seleccionado:", file);
+      console.log("📸 Archivo seleccionado:", file.name);
       const reader = new FileReader();
       reader.onload = function (e) {
         preview.src = e.target.result;
@@ -44,4 +45,10 @@ function iniciarEscaneo() {
       preview.style.display = "none";
     }
   });
+}
+
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", iniciarEscaneo);
+} else {
+  iniciarEscaneo();
 }
