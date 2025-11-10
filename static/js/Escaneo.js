@@ -1,4 +1,4 @@
-// -------------------- BOTÓN DE CARGA --------------------
+// -------------------- ELEMENTOS --------------------
 const uploadBtn = document.getElementById("uploadBtn");
 const fileInput = document.getElementById("fileInput");
 const preview = document.getElementById("preview");
@@ -7,28 +7,36 @@ const progressContainer = document.getElementById("progressContainer");
 const progress = document.getElementById("progress");
 const resultadoDiv = document.getElementById("resultado");
 
+// -------------------- BOTÓN DE CARGA --------------------
 uploadBtn.addEventListener("click", () => {
+  console.log("Click en Cargar Imagen");
   fileInput.click();
 });
 
-// -------------------- VISTA PREVIA DE IMAGEN --------------------
+// -------------------- VISTA PREVIA --------------------
 fileInput.addEventListener("change", function () {
   const file = this.files[0];
+  console.log("Archivo seleccionado:", file);
   if (file) {
     const reader = new FileReader();
     reader.onload = function (e) {
       preview.src = e.target.result;
       preview.style.display = "block";
       analyzeBtn.disabled = false;
+      console.log("Botón Analizar habilitado");
     };
     reader.readAsDataURL(file);
+  } else {
+    analyzeBtn.disabled = true;
+    preview.style.display = "none";
   }
 });
 
-// -------------------- ENVÍO AL BACKEND --------------------
+// -------------------- BOTÓN ANALIZAR --------------------
 analyzeBtn.addEventListener("click", async () => {
-  const file = fileInput.files[0];
+  console.log("Click detectado en Analizar");
 
+  const file = fileInput.files[0];
   if (!file) {
     alert("Por favor, selecciona una imagen primero.");
     return;
@@ -40,7 +48,14 @@ analyzeBtn.addEventListener("click", async () => {
   // Mostrar barra de progreso inicial
   progress.style.width = "0%";
   progressContainer.style.display = "block";
-  progress.style.width = "40%";
+
+  // Animación simple de progreso hasta 80%
+  let width = 0;
+  const interval = setInterval(() => {
+    if (width >= 80) clearInterval(interval);
+    width += 1;
+    progress.style.width = width + "%";
+  }, 30);
 
   try {
     const response = await fetch("/analizar", {
@@ -48,9 +63,12 @@ analyzeBtn.addEventListener("click", async () => {
       body: formData,
     });
 
-    if (!response.ok) throw new Error("Error en el servidor");
+    console.log("Respuesta del servidor:", response);
+
+    if (!response.ok) throw new Error(`HTTP error ${response.status}`);
 
     const data = await response.json();
+    console.log("Datos recibidos:", data);
 
     if (data.error) {
       alert("❌ " + data.error);
@@ -59,6 +77,7 @@ analyzeBtn.addEventListener("click", async () => {
       return;
     }
 
+    // Completar barra de progreso
     progress.style.width = "100%";
 
     // Mostrar resultado
@@ -71,9 +90,10 @@ analyzeBtn.addEventListener("click", async () => {
       <button id="descargarPdfBtn" class="btn-analizar">Descargar PDF</button>
     `;
 
-    // Botón para descargar PDF
+    // Descargar PDF
     const descargarPdfBtn = document.getElementById("descargarPdfBtn");
     descargarPdfBtn.addEventListener("click", async () => {
+      console.log("Click en Descargar PDF");
       try {
         const pdfResponse = await fetch("/generar_pdf", {
           method: "POST",
@@ -108,8 +128,8 @@ analyzeBtn.addEventListener("click", async () => {
     }, 2000);
 
   } catch (error) {
-    console.error(error);
-    alert("Error al analizar la imagen.");
+    console.error("Error al analizar:", error);
+    alert("Error al analizar la imagen. Revisa la consola para más detalles.");
     progressContainer.style.display = "none";
     progress.style.width = "0%";
   }
