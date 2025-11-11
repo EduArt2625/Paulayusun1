@@ -139,7 +139,7 @@ def analizar():
         ]
         clases = clases[indice] if indice < len(clases) else "Desconocida"
 
-        print(f"✅ Resultado: {clase} ({confianza}%)")
+        print(f"✅ Resultado: {clases} ({confianza}%)")
 
         return jsonify({
             "clase": clases,
@@ -200,6 +200,5 @@ def generar_pdf():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
-
 
 
