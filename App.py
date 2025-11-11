@@ -137,12 +137,12 @@ def analizar():
             "Carcinoma de células escamosas",
             "Lesión Benigna"
         ]
-        clase = clases[indice] if indice < len(clases) else "Desconocida"
+        clases = clases[indice] if indice < len(clases) else "Desconocida"
 
         print(f"✅ Resultado: {clase} ({confianza}%)")
 
         return jsonify({
-            "clase": clase,
+            "clase": clases,
             "confianza": confianza,
             "imagen_url": f"/static/uploads/{file.filename}"
         })
@@ -200,5 +200,6 @@ def generar_pdf():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
 
